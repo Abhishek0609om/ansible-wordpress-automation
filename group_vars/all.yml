@@ -1,0 +1,16 @@
+#word press
+wordpress_root: /home/abhi/blog/public
+
+#Database
+db_name: wordpress
+db_user: wpuser
+db_password: "{{ vault_db_password }}"
+db_host: localhost
+
+#Linux user
+site_owner: abhi
+site_group: abhi
+
+#SSL
+ssl_cert_file: /etc/ssl/certs/wordpress.crt
+ssl_key_file: /etc/ssl/private/wordpress.key

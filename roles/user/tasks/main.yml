@@ -1,0 +1,43 @@
+---
+- name: Create website user
+  ansible.builtin.user:
+    name: abhi
+    home: /home/abhi
+    shell: /bin/bash
+    state: present
+
+- name: Create website Directory 
+  ansible.builtin.file:
+    path: /home/abhi/blog/public
+    state: directory 
+    owner: abhi
+    group: abhi
+    mode: '0755'
+
+- name: Set chroot root ownership
+  ansible.builtin.file:
+    path: /home/abhi/blog
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure SSHD for SFTP chroot jail
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+      Subsystem sftp internal-sftp
+
+      Match User abhi
+          ChrootDirectory /home/abhi/blog
+          ForceCommand internal-sftp
+          X11Forwarding no
+          AllowTcpForwarding no
+    marker: "# {mark} SFTP CHROOT FOR abhi"
+    state: present
+
+- name: Restart SSHD
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+

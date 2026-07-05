@@ -1,0 +1,10 @@
+location /phpmyadmin {
+    alias /usr/share/nginx/html/phpmyadmin;
+    index index.php;
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php-fpm/www.sock;
+        fastcgi_param SCRIPT_FILENAME $request_filename;
+    }
+}

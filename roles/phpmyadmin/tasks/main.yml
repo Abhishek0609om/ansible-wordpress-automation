@@ -1,0 +1,53 @@
+---
+- name: Create temporary directory
+  ansible.builtin.file:
+    path: /tmp/phpmyadmin
+    state: directory
+    mode: '0755'
+
+- name: Download phpMyAdmin
+  ansible.builtin.get_url:
+    url: "https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.tar.xz"
+    dest: /tmp/phpmyadmin.tar.xz
+    mode: '0644'
+
+- name: Extract phpMyAdmin
+  ansible.builtin.unarchive:
+    src: /tmp/phpmyadmin.tar.xz
+    dest: /tmp/phpmyadmin
+    remote_src: yes
+
+- name: Find extracted directory
+  ansible.builtin.find:
+    paths: /tmp/phpmyadmin
+    file_type: directory
+    patterns: "phpMyAdmin-*"
+  register: phpmyadmin_dir
+
+- name: Create phpMyAdmin web directory
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/phpmyadmin
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: '0755'
+
+- name: Copy phpMyAdmin files
+  ansible.builtin.copy:
+    src: "{{ phpmyadmin_dir.files[0].path }}/"
+    dest: /usr/share/nginx/html/phpmyadmin/
+    remote_src: yes
+
+- name: Set ownership
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/phpmyadmin
+    owner: nginx
+    group: nginx
+    recurse: yes
+
+- name: Copy sample configuration
+  ansible.builtin.copy:
+    src: /usr/share/nginx/html/phpmyadmin/config.sample.inc.php
+    dest: /usr/share/nginx/html/phpmyadmin/config.inc.php
+    remote_src: yes
+    force: no

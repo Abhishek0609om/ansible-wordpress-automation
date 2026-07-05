@@ -1,0 +1,21 @@
+---
+- name: Install PHP
+  dnf:
+    name:
+      - php
+      - php-fpm
+      - php-mysqlnd
+      - php-cli
+      - php-json
+      - php-gd
+      - php-mbstring
+      - php-xml
+      - php-curl
+      - php-zip
+    state: present
+
+- name: Start and enable PHP-FPM
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes
